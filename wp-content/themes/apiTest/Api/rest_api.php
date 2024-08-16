@@ -15,7 +15,6 @@ function add_cors_headers()
 }
 
 
-
 // Register routes
 
 // add_action('rest_api_init', function () {
