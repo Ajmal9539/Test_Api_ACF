@@ -1,0 +1,2 @@
+2024-06-20 09:11:42 GMT+0000 (INFO): 6673f24d7d3b71.54729510: Updating database version to 2.35.9 (end).
+2024-06-20 09:11:43 GMT+0000 (INFO): deleteOldRedirectsCron. Old captured URLs removed: 0, Old automatic redirects removed: 0, Old manual redirects removed: 0, Old log lines removed: 0, New log size: 0MB, Duplicate rows deleted: 0, Debug file size limited: false, Admin email notification option turned off., Permlink cache rows updated: 0, User initiated: false
