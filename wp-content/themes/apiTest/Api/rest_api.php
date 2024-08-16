@@ -50,8 +50,6 @@ function add_cors_headers()
 // });
 
 
-
-
 add_action('rest_api_init', function () {
 
   $routes = [
