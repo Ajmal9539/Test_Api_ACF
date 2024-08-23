@@ -1,21 +1,32 @@
 <?php
 
-// Function to add headers for CORS and other necessary headers
 function add_cors_headers()
 {
-  // Allowed origin
-  $allowed_origin = 'http://localhost/treace.wp/';
+  $allowed_origin = 'http://localhost/api_test_wp';
 
-  header("HTTP/1.0 200 OK");
-  header("Access-Control-Allow-Origin: $allowed_origin");
+  $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+
+  if ($origin === $allowed_origin) {
+    header("Access-Control-Allow-Origin: $allowed_origin");
+  } else {
+    // Optionally, handle cases where the origin does not match
+    header("Access-Control-Allow-Origin: null");
+  }
+
   header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
   header("Access-Control-Allow-Credentials: true");
   header("Access-Control-Allow-Headers: Authorization, Content-Type, X-WP-Nonce");
   header("Content-Type: application/json");
+
+  // Handle OPTIONS requests
+  if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header("HTTP/1.0 204 No Content");
+    exit;
+  }
 }
 
 
-// Register routes
+// // Register routes
 
 // add_action('rest_api_init', function () {
 
@@ -185,43 +196,43 @@ function api_delete_post($request)
 
 function api_handle_file_upload($file, $post_id)
 {
-    // Ensure required WordPress functions are available
-    if (!function_exists('wp_handle_upload')) {
-        require_once(ABSPATH . 'wp-admin/includes/file.php');
-    }
-    if (!function_exists('wp_generate_attachment_metadata')) {
-        require_once(ABSPATH . 'wp-admin/includes/image.php');
-    }
-    if (!function_exists('wp_insert_attachment')) {
-        require_once(ABSPATH . 'wp-admin/includes/media.php');
-    }
+  // Ensure required WordPress functions are available
+  if (!function_exists('wp_handle_upload')) {
+    require_once(ABSPATH . 'wp-admin/includes/file.php');
+  }
+  if (!function_exists('wp_generate_attachment_metadata')) {
+    require_once(ABSPATH . 'wp-admin/includes/image.php');
+  }
+  if (!function_exists('wp_insert_attachment')) {
+    require_once(ABSPATH . 'wp-admin/includes/media.php');
+  }
 
-    // Handle the file upload
-    $upload = wp_handle_upload($file, ['test_form' => false]);
+  // Handle the file upload
+  $upload = wp_handle_upload($file, ['test_form' => false]);
 
-    if (isset($upload['error'])) {
-        return new WP_Error('upload_error', $upload['error'], ['status' => 500]);
-    }
+  if (isset($upload['error'])) {
+    return new WP_Error('upload_error', $upload['error'], ['status' => 500]);
+  }
 
-    // Prepare attachment data
-    $attachment = [
-        'post_mime_type' => $upload['type'],
-        'post_title'     => sanitize_file_name($file['name']),
-        'post_content'   => '',
-        'post_status'    => 'inherit',
-        'post_parent'    => $post_id
-    ];
+  // Prepare attachment data
+  $attachment = [
+    'post_mime_type' => $upload['type'],
+    'post_title'     => sanitize_file_name($file['name']),
+    'post_content'   => '',
+    'post_status'    => 'inherit',
+    'post_parent'    => $post_id
+  ];
 
-    // Insert the attachment
-    $attachment_id = wp_insert_attachment($attachment, $upload['file'], $post_id);
+  // Insert the attachment
+  $attachment_id = wp_insert_attachment($attachment, $upload['file'], $post_id);
 
-    if (is_wp_error($attachment_id)) {
-        return $attachment_id;
-    }
-
-    // Generate and update attachment metadata
-    $attach_data = wp_generate_attachment_metadata($attachment_id, $upload['file']);
-    wp_update_attachment_metadata($attachment_id, $attach_data);
-
+  if (is_wp_error($attachment_id)) {
     return $attachment_id;
+  }
+
+  // Generate and update attachment metadata
+  $attach_data = wp_generate_attachment_metadata($attachment_id, $upload['file']);
+  wp_update_attachment_metadata($attachment_id, $attach_data);
+
+  return $attachment_id;
 }
