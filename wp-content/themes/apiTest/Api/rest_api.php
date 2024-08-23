@@ -194,6 +194,7 @@ function api_delete_post($request)
   return new WP_REST_Response(['message' => 'Post Deleted Successfully.', 'post_id' => $post_id], 200);
 }
 
+// File handling 
 function api_handle_file_upload($file, $post_id)
 {
   // Ensure required WordPress functions are available
